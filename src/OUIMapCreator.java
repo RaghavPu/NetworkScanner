@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class OUIMapCreator
 {
-    public static HashMap<String, String> OUI_VENDOR_MAP = readOuiMap("oui.txt");
+    public static HashMap<String, String> OUI_VENDOR_MAP = readOuiMap("ouiMap.ser");
 
     public static void main(String[] args)
     {
@@ -15,14 +15,16 @@ public class OUIMapCreator
             System.out.println(entry.getKey() + " : " + entry.getValue());
         }
 
-//        saveOuiMapToFile(ouiMap);
+
+//        HashMap<String, String> ouiMap = createHashMap2("oui2.txt");
+//        saveOuiMapToFile(ouiMap, "ouiMap2.ser");
     }
 
     public static HashMap<String, String> createHashMap(String fileName) {
         HashMap<String, String> ouiMap = new HashMap<String, String>();
         try
         {
-            Scanner s = new Scanner(new File("oui.txt"));
+            Scanner s = new Scanner(new File(fileName));
             while (s.hasNextLine())
             {
                 String oui = s.next(); s.next();
@@ -41,16 +43,37 @@ public class OUIMapCreator
         return ouiMap;
     }
 
-    public static void saveOuiMapToFile(HashMap<String, String> ouiMap) {
+    public static HashMap<String, String> createHashMap2(String fileName) {
+        HashMap<String, String> ouiMap = new HashMap<String, String>();
+        try
+        {
+            Scanner s = new Scanner(new File(fileName));
+            while (s.hasNextLine())
+            {
+                String oui = s.next();
+                String companyName = s.nextLine().trim();
+
+                ouiMap.put(oui, companyName);
+            }
+        } catch (FileNotFoundException e)
+        {
+            System.out.println("Error while finding OUI text file.");
+            e.printStackTrace();
+        }
+
+        return ouiMap;
+    }
+
+    public static void saveOuiMapToFile(HashMap<String, String> ouiMap, String fileName) {
         try {
-            FileOutputStream fileOut = new FileOutputStream("ouiMap.ser");
+            FileOutputStream fileOut = new FileOutputStream(fileName);
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
 
             out.writeObject(ouiMap);
             out.close();
             fileOut.close();
 
-            System.out.println("OUI Map has been saved to 'ouiMap.ser'");
+            System.out.println("OUI Map has been saved to '" + fileName + "'");
         } catch (IOException e) {
             System.out.println("Error saving map to file");
             e.printStackTrace();
@@ -61,7 +84,7 @@ public class OUIMapCreator
         HashMap<String, String> ouiMap = null;
         try
         {
-            FileInputStream fileIn = new FileInputStream("ouiMap.ser");
+            FileInputStream fileIn = new FileInputStream(fileName);
             ObjectInputStream in = new ObjectInputStream(fileIn);
             ouiMap = (HashMap<String, String>) in.readObject();
 

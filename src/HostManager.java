@@ -1,18 +1,25 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class HostManager
 {
-    private List<Host> hosts;
+    public static List<Host> hosts;
 
     public HostManager(String startIP, String endIP) {
-        hosts = new ArrayList<Host>();
+        hosts = Collections.synchronizedList(new ArrayList<Host>());
 
-        List<IPAddress> ipAddresses = IPManager.verifyRemoteConnections(startIP, endIP);
-        List<MacAddress> macAddresses = IPManager.findMacAddresses(ipAddresses);
-
-        for (int i = 0; i < ipAddresses.size(); i++)
-            hosts.add(new Host(ipAddresses.get(i), macAddresses.get(i)));
+        List<IPAddress> ipRange = IPManager.getIPRange(startIP, endIP);
+        for (int i = 0; i < ipRange.size(); i++)
+        {
+            IPConnectionSearch ipConnectionSearch = new IPConnectionSearch(ipRange.get(i));
+            new Thread(ipConnectionSearch).start();
+        }
+//        List<IPAddress> ipAddresses = IPManager.verifyRemoteConnections(startIP, endIP);
+//        List<MacAddress> macAddresses = IPManager.findMacAddresses(ipAddresses);
+//
+//        for (int i = 0; i < ipAddresses.size(); i++)
+//            hosts.add(new Host(ipAddresses.get(i), macAddresses.get(i)));
     }
 
     @Override

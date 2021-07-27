@@ -16,7 +16,7 @@ public class Host
 
     public static String getVendor(MacAddress macAddress) {
         String macAddressString = macAddress.toString()
-                .replace(':', '-')
+                .replaceAll(":", "-")
                 .substring(0, 8)
                 .toUpperCase();
 
